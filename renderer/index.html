@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src data:; style-src 'self'">
+  <title>粘贴板</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <input id="search" type="text" placeholder="搜索粘贴板… (/)">
+      <div id="filter" class="tabs">
+        <button data-f="all" class="active">全部</button>
+        <button data-f="text">文本</button>
+        <button data-f="image">图片</button>
+        <button data-f="pinned">置顶</button>
+        <button id="clear" title="清空历史">清空</button>
+        <button id="theme" title="切换主题">☀</button>
+      </div>
+    </header>
+    <ul id="list"></ul>
+    <footer>
+      <span id="hint">↑↓ 选择 · Enter 粘贴 · Del 删除 · Esc 关闭 · 点击=复制</span>
+    </footer>
+  </div>
+  <div id="toast"></div>
+  <script src="renderer.js"></script>
+</body>
+</html>

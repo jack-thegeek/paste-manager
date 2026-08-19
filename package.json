@@ -1,0 +1,24 @@
+{
+  "name": "paste-manager",
+  "version": "0.1.0",
+  "description": "Clipboard manager with tray + Win+V summon, text & image support",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
+    "electron": "^31.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "node-global-key-listener": "^0.3.0"
+  }
+}

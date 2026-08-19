@@ -1,0 +1,13 @@
+const { contextBridge, ipcRenderer } = require('electron')
+
+contextBridge.exposeInMainWorld('pasteAPI', {
+  getHistory: () => ipcRenderer.invoke('get-history'),
+  clearHistory: () => ipcRenderer.invoke('clear-history'),
+  copyItem: (index) => ipcRenderer.invoke('copy-item', index),
+  pasteItem: (index) => ipcRenderer.invoke('paste-item', index),
+  deleteItem: (index) => ipcRenderer.invoke('delete-item', index),
+  togglePin: (index) => ipcRenderer.invoke('toggle-pin', index),
+  setTheme: (t) => ipcRenderer.send('set-theme', t),
+  hideWindow: () => ipcRenderer.send('hide-window'),
+  onUpdated: (cb) => ipcRenderer.on('history-updated', (_e, history) => cb(history))
+})
