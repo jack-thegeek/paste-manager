@@ -38,7 +38,6 @@ pnpm start
 - **历史记录**：SQLite 数据库 `~/.config/Paste Manager/paste.db`
   （文本存原始字符串，图片存 base64 dataURL；WAL 模式，实时写入）
 - **主题偏好**：`~/.config/Paste Manager/theme.json`
-- **旧版数据**：首次启动时自动从 `history.json` 一次性迁移到 SQLite，迁移后该文件不再使用（保留作备份）
 
 ## 注意事项
 

@@ -192,26 +192,7 @@ function initDb() {
       pinned INTEGER NOT NULL DEFAULT 0
     )
   `)
-  migrateFromJson()
   refreshHistory()
-}
-
-function migrateFromJson() {
-  const { c } = db.prepare('SELECT COUNT(*) AS c FROM history').get()
-  if (c > 0) return
-  let items = []
-  try {
-    const raw = fs.readFileSync(path.join(app.getPath('userData'), 'history.json'), 'utf8')
-    items = JSON.parse(raw)
-    if (!Array.isArray(items)) items = []
-  } catch (e) { items = [] }
-  if (items.length === 0) return
-  const insert = db.prepare('INSERT INTO history (type, data, preview, ts, pinned) VALUES (?, ?, ?, ?, ?)')
-  db.transaction(() => {
-    for (const it of items) {
-      insert.run(it.type, it.data, it.preview || '', it.ts || Date.now(), it.pinned ? 1 : 0)
-    }
-  })()
 }
 
 function addHistory(item) {
