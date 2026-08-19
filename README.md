@@ -36,7 +36,7 @@ pnpm start
 ## 数据存储
 
 - **历史记录**：SQLite 数据库 `~/.config/Paste Manager/paste.db`
-  （文本存原始字符串，图片存 base64 dataURL；WAL 模式，实时写入）
+  （文本存 TEXT，图片存 **BLOB 二进制（PNG）**；WAL 模式，实时写入）
 - **主题偏好**：`~/.config/Paste Manager/theme.json`
 
 ## 注意事项
@@ -48,7 +48,7 @@ pnpm start
    否则启动报 `NODE_MODULE_VERSION` 不匹配 / SIGSEGV。当前 Electron 版本需 ABI 125。
 2. **Windows 上 `Win+V` 冲突**：Windows 系统将 `Win+V` 绑定为「剪贴板历史」，两者会抢响应，该场景下唤出键可能失效或被系统弹窗拦截。Linux 无此问题。
 3. **Linux 托盘交互**：点击系统图标弹出菜单（打开 / 清空历史 / 退出），菜单由 `Menu.buildFromTemplate` 构建。部分 GNOME 托盘扩展可能不触发左键 `click` 事件。
-4. **图片以 base64 存储**：图片 dataURL 会显著增大数据库体积；历史自动淘汰时，最先淘汰最旧的未置顶记录。
+4. **图片存 BLOB**：图片以 PNG 二进制存入 `blob` 列（不再用 base64 文本），读取时转为 dataURL 供渲染；历史自动淘汰时，最先淘汰最旧的未置顶记录。
 5. **重复内容去重**：相同文本/图片在历史中仅保留一条，重复复制时自动置顶到第一位；去重会保留该项的置顶状态。
 
 ## 平台支持

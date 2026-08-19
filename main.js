@@ -168,7 +168,7 @@ function clipText(text) {
 const rowToItem = (r) => ({
   id: r.id,
   type: r.type,
-  data: r.data,
+  data: r.blob ? `data:image/png;base64,${r.blob.toString('base64')}` : r.data,
   preview: r.preview,
   ts: r.ts,
   pinned: !!r.pinned
@@ -186,23 +186,34 @@ function initDb() {
     CREATE TABLE IF NOT EXISTS history (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       type TEXT NOT NULL,
-      data TEXT NOT NULL,
+      data TEXT NOT NULL DEFAULT '',
+      blob BLOB,
       preview TEXT NOT NULL DEFAULT '',
       ts INTEGER NOT NULL,
       pinned INTEGER NOT NULL DEFAULT 0
     )
   `)
+  try { db.exec('ALTER TABLE history ADD COLUMN blob BLOB') } catch (e) { /* column already exists */ }
   refreshHistory()
 }
 
 function addHistory(item) {
-  if (item.type === 'text') item.preview = clipText(item.data)
-  if (item.type === 'image') item.preview = '[图片]'
-  const dup = db.prepare('SELECT pinned FROM history WHERE type = ? AND data = ? ORDER BY id DESC').get(item.type, item.data)
-  const pinned = dup ? !!dup.pinned : false
-  db.prepare('DELETE FROM history WHERE type = ? AND data = ?').run(item.type, item.data)
-  db.prepare('INSERT INTO history (type, data, preview, ts, pinned) VALUES (?, ?, ?, ?, ?)')
-    .run(item.type, item.data, item.preview, item.ts, pinned ? 1 : 0)
+  if (item.type === 'text') {
+    item.preview = clipText(item.data)
+    const dup = db.prepare('SELECT pinned FROM history WHERE type = ? AND data = ? ORDER BY id DESC').get('text', item.data)
+    const pinned = dup ? !!dup.pinned : false
+    db.prepare('DELETE FROM history WHERE type = ? AND data = ?').run('text', item.data)
+    db.prepare('INSERT INTO history (type, data, preview, ts, pinned, blob) VALUES (?, ?, ?, ?, ?, ?)')
+      .run('text', item.data, item.preview, item.ts, pinned ? 1 : 0, null)
+  } else if (item.type === 'image') {
+    item.preview = '[图片]'
+    item.data = `data:image/png;base64,${item.png.toString('base64')}`
+    const dup = db.prepare('SELECT pinned FROM history WHERE type = ? AND blob = ? ORDER BY id DESC').get('image', item.png)
+    const pinned = dup ? !!dup.pinned : false
+    db.prepare('DELETE FROM history WHERE type = ? AND blob = ?').run('image', item.png)
+    db.prepare('INSERT INTO history (type, data, preview, ts, pinned, blob) VALUES (?, ?, ?, ?, ?, ?)')
+      .run('image', item.data, item.preview, item.ts, pinned ? 1 : 0, item.png)
+  }
   trimHistory()
   refreshHistory()
   if (win && win.isVisible()) win.webContents.send('history-updated', history)
@@ -219,7 +230,7 @@ function trimHistory() {
 }
 
 function clearHistory() {
-  db.prepare('DELETE FROM history').run()
+  db.prepare('DELETE FROM history WHERE pinned = 0').run()
   refreshHistory()
   currentPoll = captureCurrentClipboard()
 }
@@ -242,11 +253,13 @@ function pollClipboard() {
     }
     const img = clipboard.readImage()
     if (!img.isEmpty()) {
-      const dataUrl = img.toDataURL()
-      const sig = dataUrl
-      if (sig !== currentPoll.imageSig) {
-        currentPoll.imageSig = sig
-        addHistory({ type: 'image', data: dataUrl, ts: Date.now() })
+      const png = img.toPNG()
+      if (png && png.length) {
+        const sig = png.toString('base64')
+        if (sig !== currentPoll.imageSig) {
+          currentPoll.imageSig = sig
+          addHistory({ type: 'image', png, ts: Date.now() })
+        }
       }
     }
   } catch (e) { /* ignore clipboard read errors */ }
@@ -271,7 +284,10 @@ function captureCurrentClipboard() {
   try { text = clipboard.readText() } catch (e) { /* ignore */ }
   try {
     const img = clipboard.readImage()
-    if (!img.isEmpty()) imageSig = img.toDataURL()
+    if (!img.isEmpty()) {
+      const png = img.toPNG()
+      if (png && png.length) imageSig = png.toString('base64')
+    }
   } catch (e) { /* ignore */ }
   return { text, imageSig }
 }
