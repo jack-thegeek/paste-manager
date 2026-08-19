@@ -4,13 +4,31 @@
   "description": "Clipboard manager with tray + Win+V summon, text & image support",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --linux AppImage"
+  },
+  "build": {
+    "appId": "com.jackthegeek.paste-manager",
+    "productName": "Paste Manager",
+    "npmRebuild": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility",
+      "icon": "build/icon.png"
+    }
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@electron/rebuild": "^4.2.0",
-    "electron": "^31.0.0"
+    "electron": "^31.0.0",
+    "electron-builder": "^26.15.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

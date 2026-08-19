@@ -1,5 +1,5 @@
 allowBuilds:
   better-sqlite3: true
-  electron: false
-onlyBuiltDependencies:
-  - electron
+  electron: true
+ignoredBuiltDependencies:
+  - electron-winstaller

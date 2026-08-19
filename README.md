@@ -33,6 +33,38 @@ pnpm install
 pnpm start
 ```
 
+## 打包（Linux 单文件 AppImage）
+
+```bash
+pnpm run dist
+```
+
+产物：`dist/Paste Manager-<version>.AppImage`（单个可执行文件，双击或命令行直接运行）。
+
+### 打包经验 / 注意事项
+
+1. **pnpm 11 构建脚本白名单**：若 `pnpm install` 报 `ERR_PNPM_IGNORED_BUILDS ... exit 1`，需在 `pnpm-workspace.yaml` 配置：
+   ```yaml
+   allowBuilds:
+     better-sqlite3: true
+     electron: true
+   ignoredBuiltDependencies:
+     - electron-winstaller
+   ```
+   （`electron-winstaller` 仅 Windows 打包用，Linux 显式忽略；`better-sqlite3`、`electron` 必须允许构建）
+
+2. **原生模块 ABI 匹配**：`pnpm install` 会重跑 better-sqlite3 的 prebuild 脚本，可能覆盖为 Node ABI（127），导致 Electron 加载 SIGSEGV / `NODE_MODULE_VERSION` 报错。修复：
+   ```bash
+   pnpm exec electron-rebuild -f -w better-sqlite3 -v 31.0.0
+   ```
+   已在 `package.json` 配置 `postinstall: electron-builder install-app-deps`，后续 `pnpm install` 会自动重编，一般无需手动。
+
+3. **图标**：打包图标为 `build/icon.png`（256×256 PNG，由脚本绘制，无资源文件）。缺失时 electron-builder 会用 Electron 默认图标。
+
+4. **无头/容器环境测试**：无 GPU 桌面环境运行 AppImage 需 `--no-sandbox`，并可能出现 GPU/zygote 报错噪音，属于环境限制而非应用问题。
+
+5. **electron-builder 首次运行会联网下载** Electron 与 AppImage 工具链（appimagetool、7zip），需保持网络可用。
+
 ## 数据存储
 
 - **历史记录**：SQLite 数据库 `~/.config/Paste Manager/paste.db`
