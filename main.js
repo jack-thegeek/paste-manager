@@ -376,9 +376,9 @@ function createTray() {
 /* ---------- shortcuts ---------- */
 
 function registerShortcuts() {
-  // Register Super+X (Linux/Win: Win+X, Mac: Cmd+X)
-  const ok = globalShortcut.register('Super+X', () => showWindow(true))
-  if (!ok) console.warn('[paste] 快捷键 Super+X 注册失败，请检查系统快捷键设置')
+  // Register Shift+Ctrl+X (Linux/Win: Ctrl+X, Mac: Cmd+X)
+  const ok = globalShortcut.register('Shift+CommandOrControl+X', () => showWindow(true))
+  if (!ok) console.warn('[paste] 快捷键 Shift+Ctrl+X 注册失败，请检查系统快捷键设置')
   // Escape is handled by the renderer process (keydown listener)
   // and by the window blur event — no global registration needed.
 }
