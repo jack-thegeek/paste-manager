@@ -112,10 +112,23 @@ function createWindow() {
   win.on('moved', saveWindowState)
 }
 
-function showWindow() {
+function showWindow(atCursor = false) {
   if (!win) return
   const { width, height } = win.getBounds()
-  if (winPos) {
+  if (atCursor) {
+    // Position near the mouse cursor
+    const cursor = screen.getCursorScreenPoint()
+    const disp = screen.getDisplayNearestPoint(cursor)
+    const wa = disp.workArea
+    let x = cursor.x + 12
+    let y = cursor.y + 12
+    // Keep within work area bounds
+    if (x + width > wa.x + wa.width) x = cursor.x - width - 12
+    if (y + height > wa.y + wa.height) y = cursor.y - height - 12
+    x = Math.max(wa.x, Math.min(x, wa.x + wa.width - width))
+    y = Math.max(wa.y, Math.min(y, wa.y + wa.height - height))
+    win.setPosition(Math.round(x), Math.round(y))
+  } else if (winPos) {
     win.setPosition(Math.round(winPos.x), Math.round(winPos.y))
   } else {
     let x = null
@@ -364,7 +377,7 @@ function createTray() {
 
 function registerShortcuts() {
   // Register Super+X (Linux/Win: Win+X, Mac: Cmd+X)
-  const ok = globalShortcut.register('Super+X', () => showWindow())
+  const ok = globalShortcut.register('Super+X', () => showWindow(true))
   if (!ok) console.warn('[paste] 快捷键 Super+X 注册失败，请检查系统快捷键设置')
   // Escape is handled by the renderer process (keydown listener)
   // and by the window blur event — no global registration needed.
