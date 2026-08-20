@@ -1,5 +1,5 @@
 const { app, BrowserWindow, Tray, Menu, globalShortcut, clipboard, nativeImage, ipcMain, screen } = require('electron')
-const { GlobalKeyboardListener } = require('node-global-key-listener')
+
 const Database = require('better-sqlite3')
 const path = require('path')
 const fs = require('fs')
@@ -362,29 +362,12 @@ function createTray() {
 
 /* ---------- shortcuts ---------- */
 
-let metaDown = false
-let keyListener = null
-
-function onGlobalKey(event) {
-  const isMeta = event.name === 'LEFT META' || event.name === 'RIGHT META' ||
-                 event.name === 'LEFT SUPER' || event.name === 'RIGHT SUPER'
-  if (event.state === 'DOWN' && isMeta) {
-    metaDown = true
-  } else if (event.state === 'UP' && isMeta) {
-    metaDown = false
-  } else if (event.state === 'DOWN' && event.name === 'V' && metaDown) {
-    showWindow()
-  }
-}
-
 function registerShortcuts() {
-  try {
-    keyListener = new GlobalKeyboardListener()
-    keyListener.addListener(onGlobalKey).catch((e) => console.warn('[paste] 键盘监听启动失败:', e.message))
-  } catch (e) {
-    console.warn('[paste] 全局键盘监听不可用，Win+V 唤出无效:', e.message)
-  }
-  globalShortcut.register('Escape', () => { if (win && win.isVisible()) win.hide() })
+  // Register Super+X (Linux/Win: Win+X, Mac: Cmd+X)
+  const ok = globalShortcut.register('Super+X', () => showWindow())
+  if (!ok) console.warn('[paste] 快捷键 Super+X 注册失败，请检查系统快捷键设置')
+  // Escape is handled by the renderer process (keydown listener)
+  // and by the window blur event — no global registration needed.
 }
 
 /* ---------- lifecycle ---------- */
@@ -400,7 +383,6 @@ app.whenReady().then(() => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
-  if (keyListener) keyListener.kill()
 })
 
 app.on('window-all-closed', (e) => {

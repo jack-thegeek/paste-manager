@@ -108,14 +108,14 @@ listEl.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { window.pasteAPI.hideWindow(); return }
   if (e.key === '/') { searchEl.focus(); e.preventDefault(); return }
-  if (document.activeElement === searchEl) return
   const items = filtered()
   if (!items.length) return
+  const inSearch = document.activeElement === searchEl
   if (e.key === 'ArrowDown') { selected = Math.min(selected + 1, items.length - 1); render(); e.preventDefault() }
   else if (e.key === 'ArrowUp') { selected = Math.max(selected - 1, 0); render(); e.preventDefault() }
   else if (e.key === 'Enter') { paste(selected) }
-  else if (e.key === 'Delete' || e.key === 'Backspace') { del(selected); render() }
-  else if (e.key === 'p' && document.activeElement !== searchEl) { togglePin(selected) }
+  else if (!inSearch && (e.key === 'Delete' || e.key === 'Backspace')) { del(selected); render() }
+  else if (!inSearch && e.key === 'p') { togglePin(selected) }
   else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) { copy(selected) }
 })
 
@@ -154,5 +154,4 @@ window.pasteAPI.onUpdated((h) => { history = h; render() })
   applyTheme(localStorage.getItem('paste-theme') || 'light')
   history = await window.pasteAPI.getHistory()
   render()
-  searchEl.focus()
 })()
