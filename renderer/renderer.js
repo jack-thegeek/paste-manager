@@ -45,6 +45,8 @@ function render() {
         ? `<img class="thumb" src="${it.data}" alt=""><div class="meta">${fmtTime(it.ts)}</div>`
         : `<div class="preview">${esc(it.preview)}</div><div class="meta">${fmtTime(it.ts)}</div>`}
     </li>`).join('')
+  const sel = listEl.querySelector('.item.selected')
+  if (sel) sel.scrollIntoView({ block: 'nearest' })
 }
 
 function toast(msg) {
