@@ -39,8 +39,12 @@ function render() {
   }
   listEl.innerHTML = items.map((it, i) => `
     <li class="item ${i === selected ? 'selected' : ''}" data-i="${i}">
-      <button class="pin ${it.pinned ? 'on' : ''}" title="置顶 (P)" data-pin="${i}">★</button>
-      <button class="del" title="删除 (Del)" data-del="${i}">×</button>
+      <button class="pin ${it.pinned ? 'on' : ''}" title="置顶 (P)" data-pin="${i}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </button>
+      <button class="del" title="删除 (Del)" data-del="${i}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       ${it.type === 'image'
         ? `<img class="thumb" src="${it.data}" alt=""><div class="meta">${fmtTime(it.ts)}</div>`
         : `<div class="preview">${esc(it.preview)}</div><div class="meta">${fmtTime(it.ts)}</div>`}
@@ -154,7 +158,6 @@ themeEl.addEventListener('click', () => {
 
 function applyTheme(t) {
   document.documentElement.dataset.theme = t
-  themeEl.textContent = t === 'light' ? '🌙' : '☀'
   localStorage.setItem('paste-theme', t)
   window.pasteAPI.setTheme(t)
 }

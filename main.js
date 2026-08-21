@@ -91,7 +91,7 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     transparent: false,
-    backgroundColor: readTheme() === 'light' ? '#ffffff' : '#1e1f24',
+    backgroundColor: readTheme() === 'light' ? '#eef1ff' : '#0b1020',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -382,7 +382,7 @@ ipcMain.on('hide-window', () => { if (win) win.hide() })
 ipcMain.on('set-theme', (e, t) => {
   const theme = t === 'light' ? 'light' : 'dark'
   try { fs.writeFileSync(path.join(app.getPath('userData'), 'theme.json'), JSON.stringify(theme)) } catch (err) { /* ignore */ }
-  if (win) win.setBackgroundColor(theme === 'light' ? '#ffffff' : '#1e1f24')
+  if (win) win.setBackgroundColor(theme === 'light' ? '#eef1ff' : '#0b1020')
 })
 
 /* ---------- tray ---------- */
