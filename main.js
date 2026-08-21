@@ -112,22 +112,51 @@ function createWindow() {
   win.on('moved', saveWindowState)
 }
 
-function showWindow(atCursor = false) {
+function getActiveWindowDIP() {
+  return new Promise((resolve) => {
+    exec('xdotool getactivewindow getwindowgeometry --shell', (err, stdout) => {
+      if (err || !stdout) return resolve(null)
+      const m = /X=(-?\d+)\nY=(-?\d+)\nWIDTH=(\d+)\nHEIGHT=(\d+)/.exec(stdout)
+      if (!m || +m[3] <= 0 || +m[4] <= 0) return resolve(null)
+      const cx = +m[1] + +m[3] / 2
+      const cy = +m[2] + +m[4] / 2
+      const s = screen.getDisplayNearestPoint({ x: cx, y: cy }).scaleFactor || 1
+      resolve({ x: +m[1] / s, y: +m[2] / s, width: +m[3] / s, height: +m[4] / s })
+    })
+  })
+}
+
+async function showWindow(atCursor = false) {
   if (!win) return
   const { width, height } = win.getBounds()
   if (atCursor) {
-    // Position near the mouse cursor
-    const cursor = screen.getCursorScreenPoint()
-    const disp = screen.getDisplayNearestPoint(cursor)
-    const wa = disp.workArea
-    let x = cursor.x + 12
-    let y = cursor.y + 12
-    // Keep within work area bounds
-    if (x + width > wa.x + wa.width) x = cursor.x - width - 12
-    if (y + height > wa.y + wa.height) y = cursor.y - height - 12
-    x = Math.max(wa.x, Math.min(x, wa.x + wa.width - width))
-    y = Math.max(wa.y, Math.min(y, wa.y + wa.height - height))
-    win.setPosition(Math.round(x), Math.round(y))
+    // Prefer the focused window: place the panel near its bottom-center (the
+    // caret/input area), since the physical mouse may sit far from where the
+    // user is typing. Fall back to the mouse cursor when xdotool is unavailable.
+    let wx = null
+    let wy = null
+    if (process.platform === 'linux') {
+      const aw = await getActiveWindowDIP()
+      if (aw) {
+        const wa = screen.getDisplayNearestPoint({ x: aw.x + aw.width / 2, y: aw.y + aw.height / 2 }).workArea
+        wx = aw.x + aw.width / 2 - width / 2
+        wy = aw.y + aw.height - height - 12
+        wx = Math.max(wa.x, Math.min(wx, wa.x + wa.width - width))
+        wy = Math.max(wa.y, Math.min(wy, wa.y + wa.height - height))
+      }
+    }
+    if (wx === null || wy === null) {
+      const cursor = screen.getCursorScreenPoint()
+      const disp = screen.getDisplayNearestPoint(cursor)
+      const wa = disp.workArea
+      let x = cursor.x + 12
+      let y = cursor.y + 12
+      if (x + width > wa.x + wa.width) x = cursor.x - width - 12
+      if (y + height > wa.y + wa.height) y = cursor.y - height - 12
+      wx = Math.max(wa.x, Math.min(x, wa.x + wa.width - width))
+      wy = Math.max(wa.y, Math.min(y, wa.y + wa.height - height))
+    }
+    win.setPosition(Math.round(wx), Math.round(wy))
   } else if (winPos) {
     win.setPosition(Math.round(winPos.x), Math.round(winPos.y))
   } else {
