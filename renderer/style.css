@@ -107,6 +107,9 @@ header .tabs button {
   border: 1px solid transparent;
   margin-bottom: 3px;
   transition: background .1s;
+  content-visibility: auto; /* ponytail: native virtualization, upgrade to JS windowing if >1k items */
+  contain-intrinsic-size: auto 80px;
+  contain: layout style paint;
 }
 .item:hover { background: var(--hover); }
 .item:hover .del { opacity: 1; }
