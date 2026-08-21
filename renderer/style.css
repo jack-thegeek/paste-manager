@@ -87,6 +87,7 @@ header .tabs button {
   cursor: pointer;
 }
 .tabs button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tabs #prev-filter, .tabs #next-filter { padding: 3px 6px; font-size: 14px; }
 .tabs #clear { margin-left: auto; border-color: var(--danger); color: var(--danger); }
 
 #list {

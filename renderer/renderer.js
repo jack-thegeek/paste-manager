@@ -110,9 +110,16 @@ listEl.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { window.pasteAPI.hideWindow(); return }
   if (e.key === '/') { searchEl.focus(); e.preventDefault(); return }
+  const inSearch = document.activeElement === searchEl
+  if (!inSearch && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    const idx = filterButtons.findIndex(b => b.dataset.f === filter)
+    const nextIdx = e.key === 'ArrowLeft' ? (idx - 1 + filterButtons.length) % filterButtons.length : (idx + 1) % filterButtons.length
+    setFilter(filterButtons[nextIdx].dataset.f)
+    e.preventDefault()
+    return
+  }
   const items = filtered()
   if (!items.length) return
-  const inSearch = document.activeElement === searchEl
   if (e.key === 'ArrowDown') { selected = Math.min(selected + 1, items.length - 1); render(); e.preventDefault() }
   else if (e.key === 'ArrowUp') { selected = Math.max(selected - 1, 0); render(); e.preventDefault() }
   else if (e.key === 'Enter') { paste(selected) }
@@ -121,13 +128,15 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) { copy(selected) }
 })
 
-document.querySelectorAll('#filter [data-f]').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#filter [data-f]').forEach((b) => b.classList.remove('active'))
-    btn.classList.add('active')
-    filter = btn.dataset.f
-    render()
-  })
+const filterButtons = [...document.querySelectorAll('#filter [data-f]')]
+function setFilter(f) {
+  filter = f
+  document.querySelectorAll('#filter [data-f]').forEach((b) => b.classList.toggle('active', b.dataset.f === f))
+  selected = 0
+  render()
+}
+filterButtons.forEach((btn) => {
+  btn.addEventListener('click', () => setFilter(btn.dataset.f))
 })
 
 $('#clear').addEventListener('click', async () => {
