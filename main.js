@@ -212,11 +212,12 @@ const rowToItem = (r) => ({
   data: r.blob ? `data:image/png;base64,${r.blob.toString('base64')}` : r.data,
   preview: r.preview,
   ts: r.ts,
-  pinned: !!r.pinned
+  pinned: !!r.pinned,
+  pos: r.pos
 })
 
 function refreshHistory() {
-  history = db.prepare('SELECT * FROM history ORDER BY id DESC').all().map(rowToItem)
+  history = db.prepare('SELECT * FROM history ORDER BY (pinned = 0) ASC, pos ASC, id DESC').all().map(rowToItem)
 }
 
 function initDb() {
@@ -231,10 +232,12 @@ function initDb() {
       blob BLOB,
       preview TEXT NOT NULL DEFAULT '',
       ts INTEGER NOT NULL,
-      pinned INTEGER NOT NULL DEFAULT 0
+      pinned INTEGER NOT NULL DEFAULT 0,
+      pos INTEGER NOT NULL DEFAULT 0
     )
   `)
   try { db.exec('ALTER TABLE history ADD COLUMN blob BLOB') } catch (e) { /* column already exists */ }
+  try { db.exec('ALTER TABLE history ADD COLUMN pos INTEGER NOT NULL DEFAULT 0') } catch (e) { /* column already exists */ }
   refreshHistory()
 }
 
@@ -379,10 +382,24 @@ ipcMain.handle('toggle-pin', (e, index) => {
   const item = history[index]
   if (!item) return false
   const pinned = item.pinned ? 0 : 1
-  db.prepare('UPDATE history SET pinned = ? WHERE id = ?').run(pinned, item.id)
-  item.pinned = !!pinned
+  if (pinned) {
+    const { m } = db.prepare('SELECT COALESCE(MIN(pos), 0) AS m FROM history WHERE pinned = 1').get()
+    db.prepare('UPDATE history SET pinned = 1, pos = ? WHERE id = ?').run(m - 1, item.id)
+  } else {
+    db.prepare('UPDATE history SET pinned = 0, pos = 0 WHERE id = ?').run(item.id)
+  }
+  refreshHistory()
   if (win && win.isVisible()) win.webContents.send('history-updated', history)
-  return item.pinned
+  return pinned
+})
+ipcMain.handle('reorder-pinned', (e, ids) => {
+  if (!Array.isArray(ids) || ids.length === 0) return history
+  const stmt = db.prepare('UPDATE history SET pos = ? WHERE id = ?')
+  const txn = db.transaction((list) => { list.forEach((id, i) => stmt.run(i, id)) })
+  txn(ids)
+  refreshHistory()
+  if (win && win.isVisible()) win.webContents.send('history-updated', history)
+  return history
 })
 ipcMain.on('hide-window', () => { if (win) win.hide() })
 ipcMain.on('set-theme', (e, t) => {

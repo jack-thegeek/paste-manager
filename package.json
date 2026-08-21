@@ -18,7 +18,9 @@
       "package.json"
     ],
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Utility",
       "icon": "build/icon.png"
     }
@@ -27,6 +29,7 @@
   "license": "MIT",
   "devDependencies": {
     "@electron/rebuild": "^4.2.0",
+    "@types/sortablejs": "^1.15.9",
     "electron": "^31.0.0",
     "electron-builder": "^26.15.3"
   },
@@ -36,6 +39,7 @@
     ]
   },
   "dependencies": {
-    "better-sqlite3": "^11.10.0"
+    "better-sqlite3": "^11.10.0",
+    "sortablejs": "^1.15.7"
   }
 }

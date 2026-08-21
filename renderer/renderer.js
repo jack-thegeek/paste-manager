@@ -38,10 +38,11 @@ function render() {
   if (selected >= items.length) selected = 0
   if (items.length === 0) {
     listEl.innerHTML = '<div class="empty">暂无记录</div>'
+    initSortable()
     return
   }
   listEl.innerHTML = items.map((it, i) => `
-    <li class="item ${i === selected ? 'selected' : ''}" data-i="${i}">
+    <li class="item ${i === selected ? 'selected' : ''}" data-i="${i}" data-id="${it.id}">
       <button class="pin ${it.pinned ? 'on' : ''}" title="置顶 (P)" data-pin="${i}">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"/></svg>
       </button>
@@ -49,11 +50,12 @@ function render() {
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       ${it.type === 'image'
-        ? `<img class="thumb" src="${it.data}" alt=""><div class="meta">${fmtTime(it.ts)}</div>`
+        ? `<img class="thumb" src="${it.data}" alt="" draggable="false"><div class="meta">${fmtTime(it.ts)}</div>`
         : `<div class="preview">${esc(it.preview)}</div><div class="meta">${fmtTime(it.ts)}</div>`}
     </li>`).join('')
   const sel = listEl.querySelector('.item.selected')
   if (sel) sel.scrollIntoView({ block: 'nearest' })
+  initSortable()
 }
 
 function toast(msg) {
@@ -113,6 +115,24 @@ listEl.addEventListener('click', (e) => {
   if (e.detail === 2) paste(selected)
   else copy(selected)
 })
+
+let sorter = null
+
+function initSortable() {
+  if (sorter) { sorter.destroy(); sorter = null }
+  if (filter !== 'pinned') return
+  sorter = new Sortable(listEl, {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    dragClass: 'sortable-drag',
+    onEnd: async () => {
+      const ids = [...listEl.children].map((li) => +li.dataset.id)
+      history = await window.pasteAPI.reorderPinned(ids)
+      render()
+    }
+  })
+}
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { window.pasteAPI.hideWindow(); return }

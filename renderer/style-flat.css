@@ -183,6 +183,8 @@ html[data-theme="light"] #theme .i-moon { display: none; }
 }
 .item:hover { background: var(--surface-2); border-color: var(--border-strong); }
 .item:hover .del, .item:hover .pin { opacity: 1; }
+.sortable-ghost { opacity: .35; }
+.sortable-chosen { box-shadow: 0 4px 18px var(--selected-glow); }
 .item.selected { background: var(--selected-bg); border-color: var(--selected-border); }
 
 .del, .pin {

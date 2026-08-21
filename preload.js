@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('pasteAPI', {
   pasteItem: (index) => ipcRenderer.invoke('paste-item', index),
   deleteItem: (index) => ipcRenderer.invoke('delete-item', index),
   togglePin: (index) => ipcRenderer.invoke('toggle-pin', index),
+  reorderPinned: (ids) => ipcRenderer.invoke('reorder-pinned', ids),
   setTheme: (t) => ipcRenderer.send('set-theme', t),
   setStyle: (s) => ipcRenderer.send('set-style', s),
   hideWindow: () => ipcRenderer.send('hide-window'),
