@@ -25,6 +25,7 @@ function filtered() {
     if (filter === 'pinned') {
       if (!it.pinned) return false
     } else {
+      if (it.pinned) return false
       if (filter === 'text' && it.type !== 'text') return false
       if (filter === 'image' && it.type !== 'image') return false
     }
