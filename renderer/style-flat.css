@@ -73,7 +73,7 @@ body {
 /* ---------- header / solid panel ---------- */
 
 header {
-  padding: 10px 12px 8px;
+  padding: 18px 12px 8px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   -webkit-app-region: drag;
@@ -118,6 +118,7 @@ header .tabs button {
   border-color: var(--accent);
   color: var(--on-accent);
 }
+.tabs button:focus { outline: none; }
 
 #clear { margin-left: auto; border-color: var(--border); color: var(--danger); }
 #clear:hover {
@@ -126,7 +127,7 @@ header .tabs button {
   color: var(--danger-strong);
 }
 
-#theme, #style {
+#theme, #style, #clear {
   width: 26px;
   height: 26px;
   padding: 0;
@@ -135,7 +136,7 @@ header .tabs button {
   justify-content: center;
   color: var(--muted);
 }
-#theme svg, #style svg {
+#theme svg, #style svg, #clear svg {
   width: 15px;
   height: 15px;
   stroke: currentColor;

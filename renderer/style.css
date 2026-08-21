@@ -98,7 +98,7 @@ body {
 /* ---------- header / glass panel ---------- */
 
 header {
-  padding: 10px 12px 8px;
+  padding: 18px 12px 8px;
   background: var(--glass);
   -webkit-backdrop-filter: var(--blur);
   backdrop-filter: var(--blur);
@@ -158,6 +158,7 @@ header .tabs button {
   color: var(--on-accent);
   box-shadow: 0 2px 12px var(--accent-glow);
 }
+.tabs button:focus { outline: none; }
 
 #clear {
   margin-left: auto;
@@ -170,7 +171,7 @@ header .tabs button {
   color: var(--danger-strong);
 }
 
-#theme, #style {
+#theme, #style, #clear {
   width: 26px;
   height: 26px;
   padding: 0;
@@ -179,7 +180,7 @@ header .tabs button {
   justify-content: center;
   color: var(--muted);
 }
-#theme svg, #style svg {
+#theme svg, #style svg, #clear svg {
   width: 15px;
   height: 15px;
   stroke: currentColor;
