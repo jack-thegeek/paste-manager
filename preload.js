@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('pasteAPI', {
   deleteItem: (index) => ipcRenderer.invoke('delete-item', index),
   togglePin: (index) => ipcRenderer.invoke('toggle-pin', index),
   setTheme: (t) => ipcRenderer.send('set-theme', t),
+  setStyle: (s) => ipcRenderer.send('set-style', s),
   hideWindow: () => ipcRenderer.send('hide-window'),
   onUpdated: (cb) => ipcRenderer.on('history-updated', (_e, history) => cb(history))
 })

@@ -91,7 +91,7 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     transparent: false,
-    backgroundColor: readTheme() === 'light' ? '#eef1ff' : '#0b1020',
+    backgroundColor: bgColor(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -284,6 +284,19 @@ function readTheme() {
   } catch (e) { return 'light' }
 }
 
+function readStyle() {
+  try {
+    const raw = fs.readFileSync(path.join(app.getPath('userData'), 'style.json'), 'utf8')
+    return JSON.parse(raw) === 'flat' ? 'flat' : 'glass'
+  } catch (e) { return 'glass' }
+}
+
+function bgColor() {
+  const flat = readStyle() === 'flat'
+  if (flat) return readTheme() === 'light' ? '#f3faf8' : '#0f172a'
+  return readTheme() === 'light' ? '#eef1ff' : '#0b1020'
+}
+
 /* ---------- clipboard polling ---------- */
 
 function pollClipboard() {
@@ -382,7 +395,12 @@ ipcMain.on('hide-window', () => { if (win) win.hide() })
 ipcMain.on('set-theme', (e, t) => {
   const theme = t === 'light' ? 'light' : 'dark'
   try { fs.writeFileSync(path.join(app.getPath('userData'), 'theme.json'), JSON.stringify(theme)) } catch (err) { /* ignore */ }
-  if (win) win.setBackgroundColor(theme === 'light' ? '#eef1ff' : '#0b1020')
+  if (win) win.setBackgroundColor(bgColor())
+})
+ipcMain.on('set-style', (e, s) => {
+  const style = s === 'flat' ? 'flat' : 'glass'
+  try { fs.writeFileSync(path.join(app.getPath('userData'), 'style.json'), JSON.stringify(style)) } catch (err) { /* ignore */ }
+  if (win) win.setBackgroundColor(bgColor())
 })
 
 /* ---------- tray ---------- */

@@ -3,6 +3,9 @@ const listEl = $('#list')
 const searchEl = $('#search')
 const toastEl = $('#toast')
 const themeEl = $('#theme')
+const styleEl = $('#style')
+const cssGlass = document.getElementById('css-glass')
+const cssFlat = document.getElementById('css-flat')
 
 let history = []
 let filter = 'all'
@@ -156,6 +159,19 @@ themeEl.addEventListener('click', () => {
   applyTheme(t)
 })
 
+styleEl.addEventListener('click', () => {
+  const cur = document.documentElement.dataset.style || 'glass'
+  applyStyle(cur === 'glass' ? 'flat' : 'glass')
+})
+
+function applyStyle(s) {
+  document.documentElement.dataset.style = s
+  cssGlass.disabled = s !== 'glass'
+  cssFlat.disabled = s !== 'flat'
+  localStorage.setItem('paste-style', s)
+  window.pasteAPI.setStyle(s)
+}
+
 function applyTheme(t) {
   document.documentElement.dataset.theme = t
   localStorage.setItem('paste-theme', t)
@@ -165,6 +181,7 @@ function applyTheme(t) {
 window.pasteAPI.onUpdated((h) => { history = h; render() })
 
 ;(async () => {
+  applyStyle(localStorage.getItem('paste-style') || 'glass')
   applyTheme(localStorage.getItem('paste-theme') || 'light')
   history = await window.pasteAPI.getHistory()
   render()

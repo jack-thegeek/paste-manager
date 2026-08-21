@@ -170,7 +170,7 @@ header .tabs button {
   color: var(--danger-strong);
 }
 
-#theme {
+#theme, #style {
   width: 26px;
   height: 26px;
   padding: 0;
@@ -179,7 +179,7 @@ header .tabs button {
   justify-content: center;
   color: var(--muted);
 }
-#theme svg {
+#theme svg, #style svg {
   width: 15px;
   height: 15px;
   stroke: currentColor;
