@@ -90,8 +90,7 @@ function createWindow() {
     resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
-    transparent: false,
-    backgroundColor: bgColor(),
+    transparent: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -291,12 +290,6 @@ function readStyle() {
   } catch (e) { return 'glass' }
 }
 
-function bgColor() {
-  const flat = readStyle() === 'flat'
-  if (flat) return readTheme() === 'light' ? '#f3faf8' : '#0f172a'
-  return readTheme() === 'light' ? '#eef1ff' : '#0b1020'
-}
-
 /* ---------- clipboard polling ---------- */
 
 function pollClipboard() {
@@ -395,12 +388,10 @@ ipcMain.on('hide-window', () => { if (win) win.hide() })
 ipcMain.on('set-theme', (e, t) => {
   const theme = t === 'light' ? 'light' : 'dark'
   try { fs.writeFileSync(path.join(app.getPath('userData'), 'theme.json'), JSON.stringify(theme)) } catch (err) { /* ignore */ }
-  if (win) win.setBackgroundColor(bgColor())
 })
 ipcMain.on('set-style', (e, s) => {
   const style = s === 'flat' ? 'flat' : 'glass'
   try { fs.writeFileSync(path.join(app.getPath('userData'), 'style.json'), JSON.stringify(style)) } catch (err) { /* ignore */ }
-  if (win) win.setBackgroundColor(bgColor())
 })
 
 /* ---------- tray ---------- */

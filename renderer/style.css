@@ -79,11 +79,7 @@ html, body { height: 100%; }
 
 body {
   font-family: "Inter", -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background:
-    radial-gradient(120% 90% at 12% -5%, var(--bg-grad-1), transparent 55%),
-    radial-gradient(130% 100% at 95% 0%, var(--bg-grad-2), transparent 50%),
-    radial-gradient(140% 110% at 50% 120%, var(--bg-grad-3), transparent 55%),
-    var(--bg);
+  background: transparent;
   color: var(--fg);
   user-select: none;
   overflow: hidden;
@@ -93,6 +89,13 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 12% -5%, var(--bg-grad-1), transparent 55%),
+    radial-gradient(130% 100% at 95% 0%, var(--bg-grad-2), transparent 50%),
+    radial-gradient(140% 110% at 50% 120%, var(--bg-grad-3), transparent 55%),
+    var(--bg);
 }
 
 /* ---------- header / glass panel ---------- */
@@ -180,6 +183,7 @@ header .tabs button {
   justify-content: center;
   color: var(--muted);
 }
+#theme:hover, #style:hover { color: var(--accent); }
 #theme svg, #style svg, #clear svg {
   width: 15px;
   height: 15px;
