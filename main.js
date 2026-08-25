@@ -183,6 +183,7 @@ async function showWindow(atCursor = false) {
   win.show()
   win.focus()
   win.webContents.send('history-updated', history)
+  win.webContents.send('window-shown')
 }
 
 function loadWindowState() {

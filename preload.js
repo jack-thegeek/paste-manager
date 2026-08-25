@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('pasteAPI', {
   setTheme: (t) => ipcRenderer.send('set-theme', t),
   setStyle: (s) => ipcRenderer.send('set-style', s),
   hideWindow: () => ipcRenderer.send('hide-window'),
-  onUpdated: (cb) => ipcRenderer.on('history-updated', (_e, history) => cb(history))
+  onUpdated: (cb) => ipcRenderer.on('history-updated', (_e, history) => cb(history)),
+  onShown: (cb) => ipcRenderer.on('window-shown', () => cb())
 })

@@ -70,7 +70,6 @@ async function copy(idx) {
   const real = items[idx]
   const realIdx = history.indexOf(real)
   await window.pasteAPI.copyItem(realIdx)
-  toast('已复制 ✓')
 }
 
 async function paste(idx) {
@@ -97,7 +96,7 @@ async function togglePin(idx) {
   await window.pasteAPI.togglePin(realIdx)
 }
 
-listEl.addEventListener('click', (e) => {
+listEl.addEventListener('click', async (e) => {
   const pinBtn = e.target.closest('.pin')
   if (pinBtn) {
     togglePin(+pinBtn.dataset.pin)
@@ -114,7 +113,10 @@ listEl.addEventListener('click', (e) => {
   selected = +li.dataset.i
   render()
   if (e.detail === 2) paste(selected)
-  else copy(selected)
+  else {
+    await copy(selected)
+    window.pasteAPI.hideWindow()
+  }
 })
 
 let sorter = null
@@ -200,6 +202,12 @@ function applyTheme(t) {
 }
 
 window.pasteAPI.onUpdated((h) => { history = h; render() })
+
+window.pasteAPI.onShown(() => {
+  searchEl.value = ''
+  if (filter !== 'all') setFilter('all')
+  else { selected = 0; render() }
+})
 
 ;(async () => {
   applyStyle(localStorage.getItem('paste-style') || 'glass')
