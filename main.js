@@ -426,7 +426,7 @@ function createTray() {
     { label: '退出', click: () => { isQuitting = true; app.quit() } }
   ])
   tray.setContextMenu(menu)
-  tray.on('click', () => tray.popUpContextMenu(menu))
+  tray.on('click', () => showWindow())
 }
 
 /* ---------- shortcuts ---------- */
