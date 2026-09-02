@@ -112,11 +112,7 @@ listEl.addEventListener('click', async (e) => {
   if (!li) return
   selected = +li.dataset.i
   render()
-  if (e.detail === 2) paste(selected)
-  else {
-    await copy(selected)
-    window.pasteAPI.hideWindow()
-  }
+  paste(selected)
 })
 
 let sorter = null
